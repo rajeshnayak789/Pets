@@ -15,6 +15,8 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -26,8 +28,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
+import com.example.android.pets.data.PetDbHelper;
+
+import org.w3c.dom.Text;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -104,6 +110,31 @@ public class EditorActivity extends AppCompatActivity {
             }
         });
     }
+    private void insertPet()
+    {
+        String nameText=mNameEditText.getText().toString().trim();
+        String breedText=mBreedEditText.getText().toString().trim();
+        String weightText=mWeightEditText.getText().toString().trim();
+        int weight = Integer.parseInt(weightText);
+
+        PetDbHelper mDbHelper = new PetDbHelper(this);
+        SQLiteDatabase db =mDbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PetEntry.COLUMN_PET_NAME,nameText);
+        contentValues.put(PetEntry.COLUMN_PET_BREED,breedText);
+        contentValues.put(PetEntry.COLUMN_PET_GENDER,mGender);
+        contentValues.put(PetEntry.COLUMN_PET_WEIGHT,weight);
+
+        long newRowId=db.insert(PetEntry.TABLE_NAME,null,contentValues);
+        if(newRowId==-1)
+        {
+            Toast.makeText(this,"Error with saving pet", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(this,"Pet saved with id:"+newRowId, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -120,6 +151,9 @@ public class EditorActivity extends AppCompatActivity {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Do nothing for now
+                insertPet();
+                finish();
+
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
@@ -133,4 +167,6 @@ public class EditorActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }
