@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
 import com.example.android.pets.data.PetContract.PetEntry;
 
 import java.util.logging.Handler;
@@ -119,8 +121,42 @@ public class PetProvider extends ContentProvider
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values)
     {
-        return null;
+        final  int match = sUriMatcher.match(uri);
+        switch(match)
+        {
+            case(PETS):
+                return insertPet(uri,values);
+                default:
+                    throw new IllegalArgumentException("Insertion is not supported for "+uri);
+
+
+        }
+
     }
+    /**
+     * Insert a pet into the database with the given content values. Return the new content URI
+     * for that specific row in the database.
+     */
+
+    private Uri insertPet(Uri uri, ContentValues values)
+    {
+        // TODO: Insert a new pet into the pets database table with the given ContentValues
+        // Get writeable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Insert the new pet with the given values
+        long id = database.insert(PetEntry.TABLE_NAME, null, values);
+        // If the ID is -1, then the insertion failed. Log an error and return null.
+        if(id==-1)
+        {
+            Log.e(LOG_TAG,"Failed to insert row for"+uri);
+            return null;
+        }
+        // Once we know the ID of the new row in the table,
+        // return the new URI with the ID appended to the end of it
+        return ContentUris.withAppendedId(uri,id);
+    }
+
     /**
      * Delete the data at the given selection and selection arguments.
      */
