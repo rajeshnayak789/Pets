@@ -113,10 +113,15 @@ public class EditorActivity extends AppCompatActivity {
     }
     private void insertPet()
     {
+        int weight = 0;
         String nameText=mNameEditText.getText().toString().trim();
         String breedText=mBreedEditText.getText().toString().trim();
         String weightText=mWeightEditText.getText().toString().trim();
-        int weight = Integer.parseInt(weightText);
+        if (!weightText.equals(""))
+        {
+            weight = Integer.parseInt(weightText);
+        }
+
 
         //PetDbHelper mDbHelper = new PetDbHelper(this);
         //SQLiteDatabase db =mDbHelper.getWritableDatabase();
